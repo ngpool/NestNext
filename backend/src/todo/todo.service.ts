@@ -1,12 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-
-interface Todo {
-  id: number;
-  title: string;
-  isCompleted: boolean;
-}
+import { Todo } from './entities/todo.entity';
 
 @Injectable()
 export class TodoService {
@@ -16,10 +11,10 @@ export class TodoService {
   ];
 
   // Create a new todo
-  create(createTodoDto: CreateTodoDto) {
+  create(createTodoDto: CreateTodoDto): Todo {
     const newTodo: Todo = {
-      id: this.todos.length + 1, // 自動採番
-      title: createTodoDto.title, // title を DTO から設定
+      id: this.todos.length + 1,
+      title: createTodoDto.title,
       isCompleted: false,
     };
     this.todos.push(newTodo);
@@ -27,21 +22,21 @@ export class TodoService {
   }
 
   // Get all todos
-  findAll() {
+  findAll(): Todo[] {
     return this.todos;
   }
 
   // Get a single todo by ID
-  findOne(id: number) {
+  findOne(id: number): Todo | null {
     return this.todos.find((todo) => todo.id === id) || null;
   }
 
   // Update a todo by ID
-  update(id: number, updateTodoDto: UpdateTodoDto) {
+  update(id: number, updateTodoDto: UpdateTodoDto): Todo | null {
     const todoIndex = this.todos.findIndex((todo) => todo.id === id);
     if (todoIndex === -1) return null;
 
-    const updatedTodo = {
+    const updatedTodo: Todo = {
       ...this.todos[todoIndex],
       ...updateTodoDto,
     };
@@ -50,7 +45,7 @@ export class TodoService {
   }
 
   // Delete a todo by ID
-  remove(id: number) {
+  remove(id: number): Todo | null {
     const todoIndex = this.todos.findIndex((todo) => todo.id === id);
     if (todoIndex === -1) return null;
 

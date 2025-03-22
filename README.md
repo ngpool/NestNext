@@ -109,7 +109,7 @@ docker compose logs backend -f
 ### アクセス方法
 
 - フロントエンド: http://localhost
-- バックエンド API: http://localhost/api
+- バックエンド API: http://localhost:81
 
 ## ディレクトリ構造
 
@@ -157,3 +157,8 @@ docker compose logs backend
 ```bash
 docker compose logs nginx
 ```
+
+## サイト一覧
+
+- オセロ
+  - http://localhost/reversi

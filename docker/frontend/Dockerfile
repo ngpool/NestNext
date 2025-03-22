@@ -1,8 +1,7 @@
 FROM node:20
-WORKDIR /app
+WORKDIR /app/frontend
 RUN apt-get update && \
     apt-get install -y git vim && \
     rm -rf /var/lib/apt/lists/*
 USER node
 EXPOSE 3000
-ENTRYPOINT [ "npm" ]

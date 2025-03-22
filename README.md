@@ -157,3 +157,8 @@ docker compose logs backend
 ```bash
 docker compose logs nginx
 ```
+
+## サイト一覧
+
+- オセロ
+  - http://localhost/reversi

@@ -27,7 +27,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./docker/frontend/logs/:/app/logs
+      - ./frontend:/app/frontend
     networks:
       - nest-next
 
@@ -43,7 +43,7 @@ services:
     depends_on:
       - database
     volumes:
-      - ./docker/backend/logs/:/app/logs
+      - ./backend:/app/backend
     networks:
       - nest-next
 

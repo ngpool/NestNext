@@ -2,13 +2,38 @@
 
 Next.js（フロントエンド）と Nest.js（バックエンド）を使用した 共同開発 アプリケーションです。
 
+## 機能一覧
+
+### 1. オセロゲーム
+
+- パス: `/reversi`
+- 特徴:
+  - 対人プレイ機能
+  - リアルタイムの盤面更新
+  - 合法手のハイライト表示
+
+### 2. ソートアルゴリズムビジュアライザー
+
+- パス: `/sort-demo`
+- 実装アルゴリズム:
+  - バブルソート (O(n²))
+  - クイックソート (O(n log n))
+  - 選択ソート (O(n²))
+  - 挿入ソート (O(n²))
+- 特徴:
+  - リアルタイムのビジュアライゼーション
+  - ソート速度の調整機能
+  - 途中停止/再開機能
+  - アルゴリズムの詳細説明
+
 ## 技術スタック
 
 ### フロントエンド
 
-- Next.js
+- Next.js (App Router)
 - TypeScript
 - TailwindCSS
+- React Hooks
 
 ### バックエンド
 
@@ -20,6 +45,7 @@ Next.js（フロントエンド）と Nest.js（バックエンド）を使用�
 
 - Docker
 - Nginx
+- Node.js (v20.x)
 
 ## 開発環境のセットアップ
 
@@ -109,6 +135,8 @@ docker compose logs backend -f
 ### アクセス方法
 
 - フロントエンド: http://localhost
+  - オセロゲーム: http://localhost/reversi
+  - ソートアルゴリズムデモ: http://localhost/sort-demo
 - バックエンド API: http://localhost:81
 
 ## ディレクトリ構造
@@ -116,7 +144,12 @@ docker compose logs backend -f
 ```
 .
 ├── frontend/          # Next.jsアプリケーション
+│   ├── src/
+│   │   └── app/     # ページコンポーネント
+│   │       ├── reversi/    # オセロゲーム
+│   │       └── sort-demo/  # ソートアルゴリズムデモ
 ├── backend/           # Nest.jsアプリケーション
+│   └── src/          # アプリケーションコード
 ├── docker/           # Dockerファイル
 │   ├── frontend/    # フロントエンド用Dockerfile
 │   ├── backend/     # バックエンド用Dockerfile
@@ -158,7 +191,10 @@ docker compose logs backend
 docker compose logs nginx
 ```
 
-## サイト一覧
+## 貢献について
 
-- オセロ
-  - http://localhost/reversi
+1. このリポジトリをフォークします
+2. 新しいブランチを作成します (`git checkout -b feature/awesome-feature`)
+3. 変更をコミットします (`git commit -m 'Add awesome feature'`)
+4. ブランチをプッシュします (`git push origin feature/awesome-feature`)
+5. プルリクエストを作成します

@@ -42,19 +42,19 @@ export default function Home() {
             </div>
           </Link>
 
-          <Link href="/test" className="group">
+          <Link href="/weather" className="group">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
               <div className="h-48 bg-pink-100 dark:bg-pink-900 rounded-lg mb-4 flex items-center justify-center">
-                <span className="text-4xl">🧪</span>
+                <span className="text-4xl">⛄</span>
               </div>
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2 group-hover:text-pink-600 dark:group-hover:text-pink-400">
-                Test Page
+                WeatherForecast
               </h2>
               <p className="text-gray-600 dark:text-gray-300">
                 Explore various features and components
               </p>
             </div>
-          </Link>
+          </Link>☃
         </div>
 
         <footer className="mt-16 text-center text-gray-600 dark:text-gray-400">

@@ -54,7 +54,7 @@ export default function Home() {
                 Explore various features and components
               </p>
             </div>
-          </Link>☃
+          </Link>
         </div>
 
         <footer className="mt-16 text-center text-gray-600 dark:text-gray-400">

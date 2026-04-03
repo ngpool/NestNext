@@ -95,6 +95,8 @@ export default function Weather() {
             </p>
           </div>
           <div className="text-right">
+            {/* Next.js の lint で <img> が推奨されないため抑止（画像サイズやremotePatterns未設定のため） */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
               alt={weather.weather[0].description}

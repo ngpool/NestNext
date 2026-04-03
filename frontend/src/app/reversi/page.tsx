@@ -1,32 +1,39 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+type Stone = "black" | "white";
+type Cell = Stone | null;
+type Board = Cell[][];
+type Position = [number, number];
+type ValidMoves = Record<string, Position[]>;
+type Scores = { black: number; white: number };
+type FlipAnimation = { row: number; col: number; delay: number; color: Stone };
+
 const ReversiGame = () => {
   // ボードのサイズ（8x8）
   const BOARD_SIZE = 8;
 
   // ゲームの状態
-  const [board, setBoard] = useState([]);
-  const [currentPlayer, setCurrentPlayer] = useState("black");
-  const [validMoves, setValidMoves] = useState({});
-  const [scores, setScores] = useState({ black: 2, white: 2 });
-  const [gameOver, setGameOver] = useState(false);
-  const [gameMessage, setGameMessage] = useState("");
-  const [flipAnimations, setFlipAnimations] = useState([]);
-  const [lastMove, setLastMove] = useState(null);
-  const [hoverCell, setHoverCell] = useState(null);
+  const [board, setBoard] = useState<Board>([]);
+  const [currentPlayer, setCurrentPlayer] = useState<Stone>("black");
+  const [validMoves, setValidMoves] = useState<ValidMoves>({});
+  const [scores, setScores] = useState<Scores>({ black: 2, white: 2 });
+  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [gameMessage, setGameMessage] = useState<string>("");
+  const [flipAnimations, setFlipAnimations] = useState<FlipAnimation[]>([]);
+  const [lastMove, setLastMove] = useState<Position | null>(null);
+  const [hoverCell, setHoverCell] = useState<Position | null>(null);
 
   // ゲームの初期化
-  useEffect(() => {
-    initializeGame();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => initializeGame(), []);
 
   // ゲームの初期化関数
   const initializeGame = () => {
     // 空のボードを作成
-    const newBoard = Array(BOARD_SIZE)
-      .fill()
-      .map(() => Array(BOARD_SIZE).fill(null));
+    const newBoard: Board = Array.from({ length: BOARD_SIZE }, () =>
+      Array.from({ length: BOARD_SIZE }, () => null as Cell)
+    );
 
     // 初期配置（中央の4マス）
     newBoard[3][3] = "white";
@@ -49,9 +56,9 @@ const ReversiGame = () => {
   };
 
   // 有効な手を見つける関数
-  const findValidMoves = (board, player) => {
-    const opponent = player === "black" ? "white" : "black";
-    const moves = {};
+  const findValidMoves = (board: Board, player: Stone): ValidMoves => {
+    const opponent: Stone = player === "black" ? "white" : "black";
+    const moves: ValidMoves = {};
 
     // 各セルを確認
     for (let row = 0; row < BOARD_SIZE; row++) {
@@ -72,12 +79,12 @@ const ReversiGame = () => {
         ];
 
         let isValidMove = false;
-        const flips = [];
+        const flips: Position[] = [];
 
         for (const [dx, dy] of directions) {
           let x = row + dx;
           let y = col + dy;
-          const toFlip = [];
+          const toFlip: Position[] = [];
 
           // 隣接するセルが相手の石か確認
           if (
@@ -116,21 +123,22 @@ const ReversiGame = () => {
   };
 
   // プレイヤーの手を処理する関数
-  const handleMove = (row, col) => {
+  const handleMove = (row: number, col: number) => {
     if (gameOver) return;
 
     const moveKey = `${row},${col}`;
-    if (!validMoves[moveKey]) return;
+    const flipsToApply = validMoves[moveKey];
+    if (!flipsToApply) return;
 
     // 最後の手を記録
     setLastMove([row, col]);
 
     // 新しいボードを作成
-    const newBoard = board.map((r) => [...r]);
+    const newBoard: Board = board.map((r) => [...r]);
     newBoard[row][col] = currentPlayer;
 
     // アニメーション用に石をひっくり返すリストをセット
-    const flipsWithDelay = validMoves[moveKey].map((pos, index) => ({
+    const flipsWithDelay: FlipAnimation[] = flipsToApply.map((pos, index) => ({
       row: pos[0],
       col: pos[1],
       delay: (index + 1) * 100, // 各石に少しずつ遅延をつける
@@ -142,7 +150,7 @@ const ReversiGame = () => {
     // ボードを更新する前にアニメーションを実行
     setTimeout(() => {
       // 石をひっくり返す
-      for (const [flipRow, flipCol] of validMoves[moveKey]) {
+      for (const [flipRow, flipCol] of flipsToApply) {
         newBoard[flipRow][flipCol] = currentPlayer;
       }
 
@@ -199,7 +207,7 @@ const ReversiGame = () => {
   };
 
   // スコアを計算する関数
-  const calculateScores = (board) => {
+  const calculateScores = (board: Board): Scores => {
     let black = 0;
     let white = 0;
 
@@ -214,18 +222,19 @@ const ReversiGame = () => {
   };
 
   // セルの背景色を決定
-  const getCellStyle = (row, col) => {
-    const isValidMove = validMoves[`${row},${col}`];
-    const isLastMove = lastMove && lastMove[0] === row && lastMove[1] === col;
-    const isHovered = hoverCell && hoverCell[0] === row && hoverCell[1] === col;
+  const getCellStyle = (row: number, col: number): React.CSSProperties => {
+    const moveKey = `${row},${col}`;
+    const isValidMove = validMoves[moveKey] !== undefined;
+    const isLastMove = lastMove !== null && lastMove[0] === row && lastMove[1] === col;
+    const isHovered = hoverCell !== null && hoverCell[0] === row && hoverCell[1] === col;
 
     // 予測表示で反転する石の場合
+    const predictedFlips =
+      hoverCell !== null ? validMoves[`${hoverCell[0]},${hoverCell[1]}`] : undefined;
     const isPredicted =
-      hoverCell &&
-      validMoves[`${hoverCell[0]},${hoverCell[1]}`] &&
-      validMoves[`${hoverCell[0]},${hoverCell[1]}`].some(
-        ([r, c]) => r === row && c === col
-      );
+      predictedFlips !== undefined
+        ? predictedFlips.some(([r, c]) => r === row && c === col)
+        : false;
 
     let bgColor = "#334155"; // デフォルト色
 
@@ -247,17 +256,22 @@ const ReversiGame = () => {
   };
 
   // 石の反転アニメーションが進行中かどうかを確認
-  const isFlipping = (row, col) => {
+  const isFlipping = (row: number, col: number): boolean => {
     return flipAnimations.some((anim) => anim.row === row && anim.col === col);
   };
 
   // アニメーション情報を取得
-  const getFlipAnimation = (row, col) => {
-    return flipAnimations.find((anim) => anim.row === row && anim.col === col);
-  };
+  const getFlipAnimation = (row: number, col: number): FlipAnimation | undefined =>
+    flipAnimations.find((anim) => anim.row === row && anim.col === col);
+
+  const getFlipAnimationColor = (row: number, col: number): Stone | null =>
+    getFlipAnimation(row, col)?.color ?? null;
+
+  const getFlipAnimationDelay = (row: number, col: number): number | null =>
+    getFlipAnimation(row, col)?.delay ?? null;
 
   // ホバー状態を処理
-  const handleMouseEnter = (row, col) => {
+  const handleMouseEnter = (row: number, col: number) => {
     const moveKey = `${row},${col}`;
     if (validMoves[moveKey]) {
       setHoverCell([row, col]);
@@ -269,8 +283,8 @@ const ReversiGame = () => {
   };
 
   // 予測表示で置かれる石かどうか
-  const isPredictedPlacement = (row, col) => {
-    return hoverCell && hoverCell[0] === row && hoverCell[1] === col;
+  const isPredictedPlacement = (row: number, col: number): boolean => {
+    return hoverCell !== null && hoverCell[0] === row && hoverCell[1] === col;
   };
 
   return (
@@ -315,9 +329,7 @@ const ReversiGame = () => {
       <div className="grid grid-cols-9 gap-px bg-gray-600 p-px rounded overflow-hidden shadow-lg">
         {/* 列ヘッダー */}
         <div className="bg-gray-800 w-8 h-8 flex items-center justify-center"></div>
-        {Array(BOARD_SIZE)
-          .fill()
-          .map((_, i) => (
+        {Array.from({ length: BOARD_SIZE }, (_, i) => (
             <div
               key={`col-${i}`}
               className="bg-gray-800 w-8 h-8 flex items-center justify-center"
@@ -356,20 +368,20 @@ const ReversiGame = () => {
                     style={{
                       backgroundColor: isFlipping(rowIdx, colIdx)
                         ? board[rowIdx][colIdx] ===
-                          getFlipAnimation(rowIdx, colIdx).color
+                          getFlipAnimationColor(rowIdx, colIdx)
                           ? board[rowIdx][colIdx] === "black"
                             ? "white"
                             : "black"
-                          : getFlipAnimation(rowIdx, colIdx).color
-                        : cell,
+                          : getFlipAnimationColor(rowIdx, colIdx)!
+                        : cell!,
                       boxShadow:
                         (isFlipping(rowIdx, colIdx)
-                          ? getFlipAnimation(rowIdx, colIdx).color
-                          : cell) === "black"
+                          ? getFlipAnimationColor(rowIdx, colIdx)!
+                          : cell!) === "black"
                           ? "inset 1px 1px 2px rgba(255, 255, 255, 0.2), inset -1px -1px 2px rgba(0, 0, 0, 0.5)"
                           : "inset 1px 1px 2px rgba(255, 255, 255, 0.7), inset -1px -1px 2px rgba(0, 0, 0, 0.2)",
                       animationDelay: isFlipping(rowIdx, colIdx)
-                        ? `${getFlipAnimation(rowIdx, colIdx).delay}ms`
+                        ? `${getFlipAnimationDelay(rowIdx, colIdx)}ms`
                         : "0ms",
                       transform: isFlipping(rowIdx, colIdx)
                         ? "rotateY(90deg)"
@@ -387,8 +399,8 @@ const ReversiGame = () => {
                         left: "20%",
                         background:
                           (isFlipping(rowIdx, colIdx)
-                            ? getFlipAnimation(rowIdx, colIdx).color
-                            : cell) === "black"
+                            ? getFlipAnimationColor(rowIdx, colIdx)!
+                            : cell!) === "black"
                             ? "rgba(255, 255, 255, 0.2)"
                             : "rgba(255, 255, 255, 0.8)",
                         filter: "blur(1px)",
